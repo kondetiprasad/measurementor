@@ -9,6 +9,7 @@ define append_if_no_such_line($file, $line, $refreshonly = 'false') {
 include stdlib
 include nodejs
 package{ 'unzip': ensure => installed }
+package{ 'zip': ensure => installed }
 
 #mongodb
 class { '::mongodb::globals':
@@ -35,11 +36,11 @@ exec { "accept_java_license":
   cwd       => "/home/vagrant",
   user      => "vagrant",
   path      => "/usr/bin/:/bin/",
-  before    => Package["oracle-java7-installer"],
+  before    => Package["oracle-java8-installer"],
   logoutput => true,
 }
 
-package { 'oracle-java7-installer':
+package { 'oracle-java8-installer':
   ensure   => installed,
   require  => Apt::Ppa['ppa:webupd8team/java'],
 }
@@ -117,23 +118,43 @@ exec { "start_kibana":
 
 ##https://forge.puppetlabs.com/paulosuzart/gvm
 #### We need groovy & grails for measurementor.  GVM can take care of them for us.
-class { 'gvm' :
+#class { 'gvm' :
+#  owner   => 'vagrant',
+#  require => [ Package['curl'] ],
+#}
+
+#gvm::package { 'grails':
+#  version    => '2.4.5',
+#  is_default => true,
+#  ensure     => present,
+#  require    => [ Package['curl'], Package["oracle-java8-installer"] ],
+#}
+
+#gvm::package { 'groovy':
+#  version    => '2.4.3',
+#  is_default => true,
+#  ensure     => present,
+#  require    => [ Package['curl'], Package["oracle-java8-installer"] ],
+#}
+
+class { 'sdkman' :
   owner   => 'vagrant',
-  require => [ Package['curl'] ],
+  group   => 'vagrant',
+  require    => [ Package['curl'], Package["zip"], Package["unzip"] ],
 }
 
-gvm::package { 'grails':
+sdkman::package { 'grails':
   version    => '2.4.5',
   is_default => true,
-  ensure     => present,
-  require    => [ Package['curl'], Package["oracle-java7-installer"] ],
+  ensure     => present, #default
+ require    => [ Package['curl'], Package["oracle-java8-installer"] ],
 }
 
-gvm::package { 'groovy':
+sdkman::package { 'groovy':
   version    => '2.4.3',
   is_default => true,
-  ensure     => present,
-  require    => [ Package['curl'], Package["oracle-java7-installer"] ],
+  ensure     => present, #default
+ require    => [ Package['curl'], Package["oracle-java8-installer"] ],
 }
 
 #TODO maybe have a gradle script that checks the application.properties, then runs the app as a standalone jar (war)
