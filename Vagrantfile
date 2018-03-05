@@ -24,14 +24,16 @@ fi
 if [ ! -d /etc/puppet/modules/mongodb ]; then
 puppet module install puppetlabs-mongodb
 fi
-if [ ! -d /etc/puppet/modules/gvm ]; then
-puppet module install paulosuzart-gvm
+if [ ! -d /etc/puppet/modules/sdkman ]; then
+#puppet module install paulosuzart-gvm
+puppet module install paulosuzart-sdkman --version 1.0.2
 fi
 if [ ! -d /etc/puppet/modules/stdlib ]; then
 puppet module install puppetlabs-stdlib
 fi
 if [ ! -d /etc/puppet/modules/nodejs ]; then
-puppet module install puppetlabs-nodejs
+#puppet module install puppetlabs-nodejs
+puppet module install willdurand-nodejs --version 2.0.0
 fi
 if [ ! -d /etc/puppet/modules/wget ]; then
 puppet module install maestrodev-wget
@@ -47,7 +49,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.synced_folder "PATH_TO_DOWNLOADED_PROJECT_HERE", "/measurementor", create: "true" #TODO change this to where you are running measurementor
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.network :forwarded_port, guest: 27017, host: 27017 #mongo
   config.vm.network :forwarded_port, guest: 28017, host: 28017 #mongo
   config.vm.network :forwarded_port, guest: 5601, host: 5601 #kibana
